@@ -2,13 +2,14 @@
 using GenericHostConsoleApp;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Hosting;
 
 await Host.CreateDefaultBuilder(args)
     .UseContentRoot(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location))
     .ConfigureLogging(logging =>
-    {
-        // Add any 3rd party loggers like NLog or Serilog
-    })
+        logging.SetMinimumLevel(LogLevel.Trace)
+    )
     .ConfigureServices((hostContext, services) =>
     {
         services
@@ -16,5 +17,4 @@ await Host.CreateDefaultBuilder(args)
             .AddSingleton<IWeatherService, WeatherService>();
 
         services.AddOptions<WeatherSettings>().Bind(hostContext.Configuration.GetSection("Weather"));
-    })
-    .RunConsoleAsync();
+    }).UseNLog().RunConsoleAsync();
